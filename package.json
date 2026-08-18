@@ -1,0 +1,12 @@
+{
+  "name": "levelup",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "mobile": "npm run start --workspace=apps/mobile",
+    "server": "npm run dev --workspace=apps/server",
+    "dev": "concurrently \"npm run server\" \"npm run mobile\""
+  }
+}
