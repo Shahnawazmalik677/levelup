@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import {
   GeneratePlanRequest,
   GeneratePlanResponse,
@@ -7,7 +8,18 @@ import {
   ApiResponse,
 } from '../types';
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3001/api';
+// On a physical device or emulator, `localhost` refers to the device itself,
+// not the machine running the API server. Derive the dev machine's LAN IP
+// from the same host Metro is already serving the bundle from.
+function resolveApiBaseUrl(): string {
+  if (process.env.EXPO_PUBLIC_API_URL) {
+    return process.env.EXPO_PUBLIC_API_URL;
+  }
+  const host = Constants.expoConfig?.hostUri?.split(':')[0];
+  return `http://${host || 'localhost'}:3001/api`;
+}
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 class ApiService {
   private baseUrl: string;
