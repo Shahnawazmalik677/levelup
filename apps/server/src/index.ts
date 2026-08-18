@@ -1,13 +1,13 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import { healthRouter } from './routes/health';
 import { learningPlanRouter } from './routes/learningPlan';
 import { videosRouter } from './routes/videos';
 import { swapTechniqueRouter } from './routes/swapTechnique';
 import { errorHandler } from './middleware/errorHandler';
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
