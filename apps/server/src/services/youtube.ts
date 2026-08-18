@@ -58,7 +58,7 @@ export async function searchVideos(
     throw new Error(`YouTube search failed: ${searchResponse.statusText}`);
   }
 
-  const searchData = await searchResponse.json();
+  const searchData = (await searchResponse.json()) as { items?: YouTubeSearchItem[] };
   const items: YouTubeSearchItem[] = searchData.items || [];
 
   if (items.length === 0) return [];
@@ -71,7 +71,7 @@ export async function searchVideos(
   });
 
   const detailResponse = await fetch(`${YOUTUBE_API_BASE}/videos?${detailParams}`);
-  const detailData = await detailResponse.json();
+  const detailData = (await detailResponse.json()) as { items?: YouTubeVideoItem[] };
   const details: YouTubeVideoItem[] = detailData.items || [];
 
   const durationMap = new Map(
