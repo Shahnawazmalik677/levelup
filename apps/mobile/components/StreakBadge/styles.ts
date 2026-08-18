@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors, spacing } from '../../constants/theme';
+import { colors, spacing, fontFamilies } from '../../constants/theme';
 
 export const styles = StyleSheet.create({
   container: {
@@ -11,9 +11,9 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   count: {
-    fontWeight: '700',
-    color: colors.warning,
+    color: colors.primary,
     marginTop: spacing.xs,
+    fontFamily: fontFamilies.numeric,
   },
   label: {
     color: colors.textSecondary,

@@ -13,6 +13,11 @@ export const styles = StyleSheet.create({
     borderRadius: borderRadius.lg,
     alignItems: 'center',
     backgroundColor: colors.card,
+    borderColor: colors.border,
+  },
+  containerSelected: {
+    backgroundColor: `${colors.primary}1A`,
+    borderColor: colors.primary,
   },
   disabled: {
     opacity: 0.5,
@@ -22,6 +27,10 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.sm,
+    backgroundColor: colors.surfaceLight,
+  },
+  iconDimmed: {
+    opacity: 0.55,
   },
   name: {
     color: colors.text,
@@ -39,5 +48,6 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     right: 8,
+    backgroundColor: colors.primary,
   },
 });

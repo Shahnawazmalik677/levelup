@@ -6,7 +6,6 @@ export const PRESET_HOBBIES: Hobby[] = [
     name: 'Chess',
     category: 'games',
     icon: '♟️',
-    color: '#7C5CFC',
     description: 'Master the game of kings',
   },
   {
@@ -14,7 +13,6 @@ export const PRESET_HOBBIES: Hobby[] = [
     name: 'Guitar',
     category: 'music',
     icon: '🎸',
-    color: '#FF6B8A',
     description: 'Strum your way to great music',
   },
   {
@@ -22,7 +20,6 @@ export const PRESET_HOBBIES: Hobby[] = [
     name: 'Poker',
     category: 'games',
     icon: '🃏',
-    color: '#4ECDC4',
     description: 'Learn to read the table',
   },
   {
@@ -30,7 +27,6 @@ export const PRESET_HOBBIES: Hobby[] = [
     name: 'Cooking',
     category: 'cooking',
     icon: '👨‍🍳',
-    color: '#E74C3C',
     description: 'Create delicious meals at home',
   },
   {
@@ -38,7 +34,6 @@ export const PRESET_HOBBIES: Hobby[] = [
     name: 'Photography',
     category: 'art',
     icon: '📷',
-    color: '#F39C12',
     description: 'Capture stunning moments',
   },
   {
@@ -46,7 +41,6 @@ export const PRESET_HOBBIES: Hobby[] = [
     name: 'Drawing',
     category: 'art',
     icon: '✏️',
-    color: '#E67E22',
     description: 'Bring your imagination to life',
   },
   {
@@ -54,7 +48,6 @@ export const PRESET_HOBBIES: Hobby[] = [
     name: 'Yoga',
     category: 'fitness',
     icon: '🧘',
-    color: '#2ECC71',
     description: 'Find balance and flexibility',
   },
   {
@@ -62,7 +55,6 @@ export const PRESET_HOBBIES: Hobby[] = [
     name: 'Piano',
     category: 'music',
     icon: '🎹',
-    color: '#9B82FC',
     description: 'Play beautiful melodies',
   },
   {
@@ -70,7 +62,6 @@ export const PRESET_HOBBIES: Hobby[] = [
     name: 'Swimming',
     category: 'sports',
     icon: '🏊',
-    color: '#3498DB',
     description: 'Glide through the water',
   },
   {
@@ -78,7 +69,6 @@ export const PRESET_HOBBIES: Hobby[] = [
     name: 'Painting',
     category: 'art',
     icon: '🎨',
-    color: '#1ABC9C',
     description: 'Express yourself with color',
   },
   {
@@ -86,7 +76,6 @@ export const PRESET_HOBBIES: Hobby[] = [
     name: 'Coding',
     category: 'tech',
     icon: '💻',
-    color: '#3498DB',
     description: 'Build things with code',
   },
   {
@@ -94,7 +83,6 @@ export const PRESET_HOBBIES: Hobby[] = [
     name: 'Gardening',
     category: 'outdoor',
     icon: '🌱',
-    color: '#27AE60',
     description: 'Grow your own green space',
   },
 ];

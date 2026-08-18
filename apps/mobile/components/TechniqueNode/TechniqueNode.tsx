@@ -32,8 +32,8 @@ const STATUS_CONFIG: Record<TechniqueStatus, {
     opacity: 1,
   },
   completed: {
-    bg: colors.success,
-    border: colors.success,
+    bg: colors.primary,
+    border: colors.primary,
     opacity: 1,
   },
   skipped: {
@@ -41,12 +41,6 @@ const STATUS_CONFIG: Record<TechniqueStatus, {
     border: colors.textMuted,
     opacity: 0.6,
   },
-};
-
-const DIFFICULTY_COLORS = {
-  easy: colors.success,
-  medium: colors.warning,
-  hard: colors.error,
 };
 
 export const TechniqueNode: React.FC<TechniqueNodeProps> = ({
@@ -109,7 +103,7 @@ export const TechniqueNode: React.FC<TechniqueNodeProps> = ({
                   styles.connector,
                   {
                     backgroundColor:
-                      status === 'completed' ? colors.success : colors.border,
+                      status === 'completed' ? colors.primary : colors.border,
                   },
                 ]}
               />
@@ -129,20 +123,8 @@ export const TechniqueNode: React.FC<TechniqueNodeProps> = ({
               {name}
             </Text>
             <View style={styles.meta}>
-              <View
-                style={[
-                  styles.difficultyBadge,
-                  { backgroundColor: `${DIFFICULTY_COLORS[difficulty]}20` },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.difficultyText,
-                    { color: DIFFICULTY_COLORS[difficulty] },
-                  ]}
-                >
-                  {difficulty}
-                </Text>
+              <View style={styles.difficultyBadge}>
+                <Text style={styles.difficultyText}>{difficulty}</Text>
               </View>
               {status === 'active' && progress > 0 && (
                 <Text style={styles.progressText}>{progress}%</Text>

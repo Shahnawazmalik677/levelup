@@ -11,7 +11,6 @@ export interface LearningPlanData {
   id: string;
   hobby: string;
   hobbyIcon: string;
-  hobbyColor: string;
   level: string;
   techniques: Technique[];
   createdAt: string;

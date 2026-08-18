@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors, spacing, borderRadius } from '../../constants/theme';
+import { colors, spacing, borderRadius, fontFamilies } from '../../constants/theme';
 
 export const styles = StyleSheet.create({
   container: {
@@ -18,8 +18,8 @@ export const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   value: {
-    fontWeight: '700',
     marginBottom: 2,
+    fontFamily: fontFamilies.numeric,
   },
   label: {
     color: colors.textSecondary,

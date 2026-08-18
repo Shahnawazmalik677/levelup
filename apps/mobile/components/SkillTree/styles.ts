@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors, spacing } from '../../constants/theme';
+import { colors, spacing, fontFamilies } from '../../constants/theme';
 
 export const styles = StyleSheet.create({
   container: {
@@ -11,7 +11,6 @@ export const styles = StyleSheet.create({
   },
   hobbyName: {
     color: colors.text,
-    fontWeight: '700',
     marginBottom: spacing.sm,
   },
   progressRow: {
@@ -24,7 +23,7 @@ export const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   progressPercent: {
-    fontWeight: '600',
+    fontFamily: fontFamilies.numeric,
   },
   progressBar: {
     height: 6,

@@ -1,13 +1,12 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
 import { Text, Surface } from 'react-native-paper';
-import { colors, spacing } from '../../constants/theme';
+import { spacing } from '../../constants/theme';
 import { styles } from './styles';
 
 interface HobbyCardProps {
   name: string;
   icon: string;
-  color: string;
   description: string;
   selected?: boolean;
   onPress?: () => void;
@@ -18,7 +17,6 @@ interface HobbyCardProps {
 export const HobbyCard: React.FC<HobbyCardProps> = ({
   name,
   icon,
-  color,
   description,
   selected = false,
   onPress,
@@ -27,7 +25,7 @@ export const HobbyCard: React.FC<HobbyCardProps> = ({
 }) => {
   const sizeStyles = {
     small: { width: 100, iconSize: 28, padding: spacing.sm },
-    medium: { width: 150, iconSize: 36, padding: spacing.md },
+    medium: { width: '48%' as const, iconSize: 36, padding: spacing.md },
     large: { width: '100%' as const, iconSize: 44, padding: spacing.lg },
   };
 
@@ -39,16 +37,16 @@ export const HobbyCard: React.FC<HobbyCardProps> = ({
       disabled={disabled}
       style={({ pressed }) => [
         styles.pressable,
+        { width: config.width },
         pressed && styles.pressed,
       ]}
     >
       <Surface
         style={[
           styles.container,
+          selected && styles.containerSelected,
           {
-            width: config.width,
             padding: config.padding,
-            borderColor: selected ? color : colors.border,
             borderWidth: selected ? 2 : 1,
           },
           disabled && styles.disabled,
@@ -59,13 +57,19 @@ export const HobbyCard: React.FC<HobbyCardProps> = ({
           style={[
             styles.iconContainer,
             {
-              backgroundColor: `${color}20`,
               width: config.iconSize + 20,
               height: config.iconSize + 20,
             },
           ]}
         >
-          <Text style={{ fontSize: config.iconSize }}>{icon}</Text>
+          <Text
+            style={[
+              { fontSize: config.iconSize },
+              !selected && styles.iconDimmed,
+            ]}
+          >
+            {icon}
+          </Text>
         </View>
         <Text
           variant={size === 'large' ? 'titleMedium' : 'labelLarge'}
@@ -79,9 +83,7 @@ export const HobbyCard: React.FC<HobbyCardProps> = ({
             {description}
           </Text>
         )}
-        {selected && (
-          <View style={[styles.selectedDot, { backgroundColor: color }]} />
-        )}
+        {selected && <View style={styles.selectedDot} />}
       </Surface>
     </Pressable>
   );

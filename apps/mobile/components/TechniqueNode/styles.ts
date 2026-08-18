@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors, spacing, borderRadius } from '../../constants/theme';
+import { colors, spacing, borderRadius, fontFamilies } from '../../constants/theme';
 
 export const styles = StyleSheet.create({
   wrapper: {
@@ -26,7 +26,7 @@ export const styles = StyleSheet.create({
   },
   checkmark: {
     fontSize: 20,
-    color: colors.success,
+    color: colors.primary,
     fontWeight: '700',
   },
   lockIcon: {
@@ -75,15 +75,17 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: borderRadius.sm,
+    backgroundColor: colors.surfaceLight,
   },
   difficultyText: {
     fontSize: 11,
     fontWeight: '600',
     textTransform: 'capitalize',
+    color: colors.textSecondary,
   },
   progressText: {
     fontSize: 12,
     color: colors.primary,
-    fontWeight: '600',
+    fontFamily: fontFamilies.numeric,
   },
 });

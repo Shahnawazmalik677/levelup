@@ -3,7 +3,6 @@ export interface Hobby {
   name: string;
   category: HobbyCategory;
   icon: string;
-  color: string;
   description: string;
 }
 

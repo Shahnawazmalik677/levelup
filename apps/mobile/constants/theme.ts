@@ -1,54 +1,49 @@
 import { MD3DarkTheme, configureFonts } from 'react-native-paper';
 
 const fontConfig = {
-  displayLarge: { fontFamily: 'System', fontWeight: '700' as const },
-  displayMedium: { fontFamily: 'System', fontWeight: '700' as const },
-  displaySmall: { fontFamily: 'System', fontWeight: '600' as const },
-  headlineLarge: { fontFamily: 'System', fontWeight: '700' as const },
-  headlineMedium: { fontFamily: 'System', fontWeight: '600' as const },
-  headlineSmall: { fontFamily: 'System', fontWeight: '600' as const },
-  titleLarge: { fontFamily: 'System', fontWeight: '600' as const },
-  titleMedium: { fontFamily: 'System', fontWeight: '500' as const },
-  titleSmall: { fontFamily: 'System', fontWeight: '500' as const },
-  bodyLarge: { fontFamily: 'System', fontWeight: '400' as const },
-  bodyMedium: { fontFamily: 'System', fontWeight: '400' as const },
-  bodySmall: { fontFamily: 'System', fontWeight: '400' as const },
-  labelLarge: { fontFamily: 'System', fontWeight: '500' as const },
-  labelMedium: { fontFamily: 'System', fontWeight: '500' as const },
-  labelSmall: { fontFamily: 'System', fontWeight: '500' as const },
+  displayLarge: { fontFamily: 'Fraunces_600SemiBold' },
+  displayMedium: { fontFamily: 'Fraunces_600SemiBold' },
+  displaySmall: { fontFamily: 'Fraunces_600SemiBold' },
+  headlineLarge: { fontFamily: 'Fraunces_600SemiBold' },
+  headlineMedium: { fontFamily: 'Fraunces_600SemiBold' },
+  headlineSmall: { fontFamily: 'Fraunces_600SemiBold' },
+  titleLarge: { fontFamily: 'PublicSans_600SemiBold' },
+  titleMedium: { fontFamily: 'PublicSans_600SemiBold' },
+  titleSmall: { fontFamily: 'PublicSans_600SemiBold' },
+  bodyLarge: { fontFamily: 'PublicSans_400Regular' },
+  bodyMedium: { fontFamily: 'PublicSans_400Regular' },
+  bodySmall: { fontFamily: 'PublicSans_400Regular' },
+  labelLarge: { fontFamily: 'PublicSans_600SemiBold' },
+  labelMedium: { fontFamily: 'PublicSans_600SemiBold' },
+  labelSmall: { fontFamily: 'PublicSans_600SemiBold' },
 };
 
+// "Quiet Craft" palette: one neutral surface, one accent (brass gold).
+// Category/status differentiation comes from icon, form and label —
+// never from a second or third hue. See design-direction artifact.
 export const colors = {
-  primary: '#7C5CFC',
-  primaryLight: '#9B82FC',
-  primaryDark: '#5A3AD4',
-  secondary: '#FF6B8A',
-  accent: '#4ECDC4',
-  success: '#2ECC71',
-  warning: '#F39C12',
-  error: '#E74C3C',
+  background: '#121214',
+  surface: '#1A1A1E',
+  surfaceLight: '#222227',
+  card: '#1D1D22',
+  border: '#2C2C33',
 
-  background: '#0F0F1A',
-  surface: '#1A1A2E',
-  surfaceLight: '#252542',
-  card: '#1E1E36',
+  text: '#F1EFEA',
+  textSecondary: '#B5B2AC',
+  textMuted: '#79766F',
 
-  text: '#FFFFFF',
-  textSecondary: '#A0A0B8',
-  textMuted: '#6B6B80',
+  primary: '#D8A34A',
+  primaryLight: '#E8C685',
+  primaryDark: '#A9782E',
+  onPrimary: '#1A1305',
 
-  border: '#2A2A45',
+  error: '#C1666B',
   overlay: 'rgba(0, 0, 0, 0.6)',
+};
 
-  categoryMusic: '#FF6B8A',
-  categorySports: '#4ECDC4',
-  categoryGames: '#7C5CFC',
-  categoryArt: '#F39C12',
-  categoryCooking: '#E74C3C',
-  categoryFitness: '#2ECC71',
-  categoryTech: '#3498DB',
-  categoryCrafts: '#E67E22',
-  categoryOutdoor: '#1ABC9C',
+// For the handful of places digits need to line up (streaks, percentages).
+export const fontFamilies = {
+  numeric: 'JetBrainsMono_500Medium',
 };
 
 export const theme = {
@@ -56,12 +51,12 @@ export const theme = {
   colors: {
     ...MD3DarkTheme.colors,
     primary: colors.primary,
-    secondary: colors.secondary,
+    secondary: colors.primary,
     background: colors.background,
     surface: colors.surface,
     error: colors.error,
-    onPrimary: '#FFFFFF',
-    onSecondary: '#FFFFFF',
+    onPrimary: colors.onPrimary,
+    onSecondary: colors.onPrimary,
     onBackground: colors.text,
     onSurface: colors.text,
     outline: colors.border,
