@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SkillTree } from '../../components/SkillTree';
 import { StreakBadge } from '../../components/StreakBadge';
@@ -12,8 +12,15 @@ import { styles } from './styles';
 
 export function MyPathScreen() {
   const router = useRouter();
-  const { plan, loading } = useLearningPlan();
-  const { streak } = useStreak();
+  const { plan, loading, refreshPlan } = useLearningPlan();
+  const { streak, refreshStreak } = useStreak();
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshPlan(true);
+      refreshStreak(true);
+    }, [refreshPlan, refreshStreak])
+  );
 
   if (loading) {
     return (

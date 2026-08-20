@@ -16,15 +16,15 @@ export const useStreak = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  const loadStreak = useCallback(async () => {
+  const loadStreak = useCallback(async (silent: boolean = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const data = await getStreakData();
       setStreak(data);
     } catch (error) {
       console.error('Failed to load streak:', error);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, []);
 

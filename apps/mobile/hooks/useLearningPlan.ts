@@ -13,15 +13,15 @@ export const useLearningPlan = () => {
   const [plan, setPlan] = useState<LearningPlanData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const loadPlan = useCallback(async () => {
+  const loadPlan = useCallback(async (silent: boolean = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const data = await getLearningPlan();
       setPlan(data);
     } catch (error) {
       console.error('Failed to load learning plan:', error);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, []);
 

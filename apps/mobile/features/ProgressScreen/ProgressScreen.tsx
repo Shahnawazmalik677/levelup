@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, ScrollView } from 'react-native';
 import { Text, Button, ProgressBar } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { StatCard } from '../../components/StatCard';
 import { StreakBadge } from '../../components/StreakBadge';
 import { EmptyState } from '../../components/EmptyState';
@@ -13,8 +13,15 @@ import { styles } from './styles';
 
 export function ProgressScreen() {
   const router = useRouter();
-  const { plan, loading, resetPlan } = useLearningPlan();
-  const { streak } = useStreak();
+  const { plan, loading, resetPlan, refreshPlan } = useLearningPlan();
+  const { streak, refreshStreak } = useStreak();
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshPlan(true);
+      refreshStreak(true);
+    }, [refreshPlan, refreshStreak])
+  );
 
   if (loading) {
     return (
