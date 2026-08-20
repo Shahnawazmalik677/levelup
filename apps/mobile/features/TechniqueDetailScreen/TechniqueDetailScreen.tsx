@@ -310,8 +310,8 @@ export function TechniqueDetailScreen() {
               mode="contained"
               onPress={handleComplete}
               disabled={!checklistComplete}
-              style={styles.completeButton}
-              labelStyle={styles.completeLabel}
+              style={[styles.completeButton, !checklistComplete && styles.completeButtonDisabled]}
+              labelStyle={[styles.completeLabel, !checklistComplete && styles.completeLabelDisabled]}
               contentStyle={styles.completeContent}
               icon="check-circle"
             >

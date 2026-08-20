@@ -111,9 +111,15 @@ export const styles = StyleSheet.create({
     marginTop: spacing.md,
     backgroundColor: colors.primary,
   },
+  completeButtonDisabled: {
+    backgroundColor: colors.surfaceLight,
+  },
   completeLabel: {
     fontSize: 16,
     color: colors.onPrimary,
+  },
+  completeLabelDisabled: {
+    color: colors.textMuted,
   },
   completeContent: {
     paddingVertical: spacing.xs,
