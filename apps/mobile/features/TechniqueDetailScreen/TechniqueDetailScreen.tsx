@@ -177,6 +177,7 @@ export function TechniqueDetailScreen() {
     (i) => i.completed
   ).length;
   const totalItems = technique.practiceChecklist.length;
+  const checklistComplete = totalItems === 0 || completedItems === totalItems;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -303,18 +304,25 @@ export function TechniqueDetailScreen() {
           ))}
         </View>
 
-        {/* Complete button */}
         {technique.status === 'active' && (
-          <Button
-            mode="contained"
-            onPress={handleComplete}
-            style={styles.completeButton}
-            labelStyle={styles.completeLabel}
-            contentStyle={styles.completeContent}
-            icon="check-circle"
-          >
-            Mark as Mastered (+{TECHNIQUE_COMPLETION_XP} XP)
-          </Button>
+          <>
+            <Button
+              mode="contained"
+              onPress={handleComplete}
+              disabled={!checklistComplete}
+              style={styles.completeButton}
+              labelStyle={styles.completeLabel}
+              contentStyle={styles.completeContent}
+              icon="check-circle"
+            >
+              Mark as Mastered (+{TECHNIQUE_COMPLETION_XP} XP)
+            </Button>
+            {!checklistComplete && (
+              <Text variant="bodySmall" style={styles.completeHint}>
+                Complete all {totalItems} practice steps to mark this as mastered
+              </Text>
+            )}
+          </>
         )}
       </ScrollView>
 

@@ -118,6 +118,11 @@ export const styles = StyleSheet.create({
   completeContent: {
     paddingVertical: spacing.xs,
   },
+  completeHint: {
+    color: colors.textMuted,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+  },
   swapOverlay: {
     ...StyleSheet.absoluteFill,
     backgroundColor: colors.overlay,
