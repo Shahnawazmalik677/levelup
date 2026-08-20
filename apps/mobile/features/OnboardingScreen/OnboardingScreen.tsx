@@ -201,6 +201,7 @@ export function OnboardingScreen() {
           onPress={() => animateTransition('hobby')}
           style={[styles.backButton]}
           labelStyle={styles.buttonLabel}
+          contentStyle={styles.buttonContent}
           textColor={colors.textSecondary}
         >
           Back

@@ -51,10 +51,14 @@ export const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   nextButton: {
+    height: 48,
+    justifyContent: 'center',
     borderRadius: borderRadius.md,
     marginBottom: spacing.xl,
   },
   backButton: {
+    height: 48,
+    justifyContent: 'center',
     borderRadius: borderRadius.md,
     borderColor: colors.border,
     marginRight: spacing.sm,
@@ -64,10 +68,11 @@ export const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonContent: {
-    paddingVertical: spacing.xs,
+    height: 48,
   },
   buttonRow: {
     flexDirection: 'row',
+    alignItems: 'stretch',
     marginBottom: spacing.xl,
   },
   loadingContainer: {
