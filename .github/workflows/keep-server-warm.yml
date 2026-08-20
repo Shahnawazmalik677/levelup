@@ -1,0 +1,16 @@
+name: Keep server warm
+
+# Render's free tier spins the server down after 15 minutes idle, costing the
+# first request afterward 30-50s. Pinging it more often than that keeps it
+# perpetually awake, so anyone opening the app never hits a cold start.
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health endpoint
+        run: curl -sf https://levelup-c4ud.onrender.com/api/health

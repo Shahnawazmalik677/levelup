@@ -10,7 +10,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://REPLACE-WITH-YOUR-RENDER-URL.onrender.com/api"
+        "EXPO_PUBLIC_API_URL": "https://levelup-c4ud.onrender.com/api"
       }
     }
   }
