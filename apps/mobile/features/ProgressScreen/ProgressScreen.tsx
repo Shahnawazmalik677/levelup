@@ -7,7 +7,7 @@ import { StatCard } from '../../components/StatCard';
 import { StreakBadge } from '../../components/StreakBadge';
 import { EmptyState } from '../../components/EmptyState';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
-import { SkillLevel, SKILL_LEVEL_LABELS } from '../../types';
+import { SKILL_LEVEL_LABELS } from '../../types';
 import { useLearningPlans } from '../../hooks/useLearningPlans';
 import { useStreak } from '../../hooks/useStreak';
 import { useMasteredHobbies } from '../../hooks/useMasteredHobbies';
@@ -85,9 +85,9 @@ export function ProgressScreen() {
   const effectiveTotal = total - skipped;
   const overallProgress = effectiveTotal > 0 ? completed / effectiveTotal : 0;
 
-  const pastLevels = levelHistory
-    .filter((entry) => entry.hobby.toLowerCase() === plan.hobby.toLowerCase())
-    .sort((a, b) => new Date(b.endedAt).getTime() - new Date(a.endedAt).getTime());
+  const pastLevels = [...levelHistory].sort(
+    (a, b) => new Date(b.endedAt).getTime() - new Date(a.endedAt).getTime()
+  );
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -162,34 +162,6 @@ export function ProgressScreen() {
           />
         </View>
 
-        {/* Level history */}
-        {pastLevels.length > 0 && (
-          <View style={styles.historySection}>
-            <Text variant="titleMedium" style={styles.sectionTitle}>
-              Level History
-            </Text>
-            {pastLevels.map((entry) => (
-              <View key={`${entry.level}-${entry.endedAt}`} style={styles.historyRow}>
-                <Text style={styles.historyIcon}>{entry.hobbyIcon}</Text>
-                <View style={styles.historyInfo}>
-                  <Text variant="bodyMedium" style={styles.historyLevel}>
-                    {SKILL_LEVEL_LABELS[entry.level as SkillLevel]?.title || entry.level}
-                  </Text>
-                  <Text variant="bodySmall" style={styles.historyDate}>
-                    {new Date(entry.endedAt).toLocaleDateString(undefined, {
-                      month: 'short',
-                      day: 'numeric',
-                    })}
-                  </Text>
-                </View>
-                <Text variant="bodySmall" style={styles.historyCount}>
-                  {entry.completed}/{entry.total}
-                </Text>
-              </View>
-            ))}
-          </View>
-        )}
-
         {/* Technique breakdown */}
         <View style={styles.breakdownSection}>
           <Text variant="titleMedium" style={styles.sectionTitle}>
@@ -232,6 +204,34 @@ export function ProgressScreen() {
             </View>
           ))}
         </View>
+
+        {/* Level history — across every hobby, not just the one selected above */}
+        {pastLevels.length > 0 && (
+          <View style={styles.historySection}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>
+              Level History
+            </Text>
+            {pastLevels.map((entry) => (
+              <View key={`${entry.level}-${entry.endedAt}`} style={styles.historyRow}>
+                <Text style={styles.historyIcon}>{entry.hobbyIcon}</Text>
+                <View style={styles.historyInfo}>
+                  <Text variant="bodyMedium" style={styles.historyLevel}>
+                    {entry.hobby} · {SKILL_LEVEL_LABELS[entry.level].title}
+                  </Text>
+                  <Text variant="bodySmall" style={styles.historyDate}>
+                    {new Date(entry.endedAt).toLocaleDateString(undefined, {
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </Text>
+                </View>
+                <Text variant="bodySmall" style={styles.historyCount}>
+                  {entry.completed}/{entry.total}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
 
         {masteredSection}
 

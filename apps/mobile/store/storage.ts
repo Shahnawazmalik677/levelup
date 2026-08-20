@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Technique } from '../types';
+import { SkillLevel, Technique } from '../types';
 
 const KEYS = {
   LEARNING_PLANS: 'learning_plans',
@@ -15,7 +15,7 @@ export interface LearningPlanData {
   id: string;
   hobby: string;
   hobbyIcon: string;
-  level: string;
+  level: SkillLevel;
   techniques: Technique[];
   createdAt: string;
 }
@@ -29,7 +29,7 @@ export interface MasteredHobby {
 export interface LevelHistoryEntry {
   hobby: string;
   hobbyIcon: string;
-  level: string;
+  level: SkillLevel;
   completed: number;
   skipped: number;
   total: number;

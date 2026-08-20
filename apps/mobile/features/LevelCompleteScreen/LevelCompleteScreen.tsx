@@ -3,7 +3,7 @@ import { View, Animated } from 'react-native';
 import { Text, Button, ActivityIndicator } from 'react-native-paper';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { SkillLevel, SKILL_LEVEL_LABELS, getNextLevel } from '../../types';
+import { SKILL_LEVEL_LABELS, getNextLevel } from '../../types';
 import { useLearningPlans } from '../../hooks/useLearningPlans';
 import { useMasteredHobbies } from '../../hooks/useMasteredHobbies';
 import { apiService } from '../../services/api';
@@ -26,7 +26,7 @@ export function LevelCompleteScreen() {
   const scale = useRef(new Animated.Value(0.85)).current;
   const opacity = useRef(new Animated.Value(0)).current;
 
-  const level = plan?.level as SkillLevel | undefined;
+  const level = plan?.level;
   const nextLevel = level ? getNextLevel(level) : null;
   const isPro = !!plan && !nextLevel;
 

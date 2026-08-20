@@ -17,9 +17,9 @@ export type HobbyCategory =
   | 'crafts'
   | 'outdoor';
 
-export type SkillLevel = 'curious' | 'beginner' | 'intermediate';
+export const SKILL_LEVEL_ORDER = ['curious', 'beginner', 'intermediate'] as const;
 
-export const SKILL_LEVEL_ORDER: SkillLevel[] = ['curious', 'beginner', 'intermediate'];
+export type SkillLevel = (typeof SKILL_LEVEL_ORDER)[number];
 
 export const getNextLevel = (level: SkillLevel): SkillLevel | null => {
   const index = SKILL_LEVEL_ORDER.indexOf(level);

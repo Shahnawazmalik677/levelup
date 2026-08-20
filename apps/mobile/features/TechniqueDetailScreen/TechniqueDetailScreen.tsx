@@ -21,11 +21,15 @@ import { isPlanComplete } from '../../store/storage';
 import { colors } from '../../constants/theme';
 import { styles } from './styles';
 
+const TECHNIQUE_COMPLETION_XP = 50;
+const CHECKLIST_ITEM_XP = 5;
+
 export function TechniqueDetailScreen() {
   const { planId, id } = useLocalSearchParams<{ planId: string; id: string }>();
   const router = useRouter();
   const {
     plans,
+    loading,
     toggleChecklistItem,
     markTechniqueComplete,
     skipTechnique,
@@ -73,7 +77,7 @@ export function TechniqueDetailScreen() {
   const handleToggleChecklist = async (itemId: string) => {
     if (!technique || !plan) return;
     await toggleChecklistItem(plan.id, technique.id, itemId);
-    await recordActivity(5);
+    await recordActivity(CHECKLIST_ITEM_XP);
   };
 
   const handleComplete = () => {
@@ -92,7 +96,7 @@ export function TechniqueDetailScreen() {
     const minDelay = new Promise<void>((resolve) => setTimeout(resolve, 1300));
     const persist = (async () => {
       const updatedPlan = await markTechniqueComplete(plan.id, technique.id);
-      await recordActivity(50);
+      await recordActivity(TECHNIQUE_COMPLETION_XP);
       await recordTechniqueCompletion();
       return updatedPlan;
     })();
@@ -125,7 +129,7 @@ export function TechniqueDetailScreen() {
     try {
       const result = await apiService.swapTechnique({
         hobby: plan.hobby,
-        level: plan.level as any,
+        level: plan.level,
         currentTechnique: technique.name,
         existingTechniques: plan.techniques.map((t) => t.name),
       });
@@ -146,6 +150,16 @@ export function TechniqueDetailScreen() {
       setSwapping(false);
     }
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   if (!technique) {
     return (
@@ -302,7 +316,7 @@ export function TechniqueDetailScreen() {
             contentStyle={styles.completeContent}
             icon="check-circle"
           >
-            Mark as Mastered (+50 XP)
+            Mark as Mastered (+{TECHNIQUE_COMPLETION_XP} XP)
           </Button>
         )}
       </ScrollView>
@@ -320,13 +334,13 @@ export function TechniqueDetailScreen() {
         visible={celebrating}
         title="Technique Mastered!"
         subtitle={technique.name}
-        xpLabel="+50 XP"
+        xpLabel={`+${TECHNIQUE_COMPLETION_XP} XP`}
       />
 
       <ConfirmDialog
         visible={completeDialogVisible}
         title="Mark as Complete?"
-        message={`Great job mastering "${technique.name}"! You'll earn 50 XP.`}
+        message={`Great job mastering "${technique.name}"! You'll earn ${TECHNIQUE_COMPLETION_XP} XP.`}
         confirmLabel="Complete!"
         cancelLabel="Not Yet"
         onConfirm={confirmComplete}

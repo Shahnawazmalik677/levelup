@@ -129,6 +129,7 @@ export function ExploreScreen() {
       setSelectedHobby(null);
       setCustomHobby('');
       setSelectedLevel(null);
+      setStep('hobby');
       router.replace('/(tabs)');
     } catch (err) {
       console.error('Failed to generate plan:', err);
