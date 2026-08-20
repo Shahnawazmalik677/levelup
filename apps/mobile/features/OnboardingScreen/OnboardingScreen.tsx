@@ -27,20 +27,7 @@ export function OnboardingScreen() {
   const isFirstRender = useRef(true);
 
   const animateTransition = (nextStep: Step) => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: -50,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      setStep(nextStep);
-    });
+    setStep(nextStep);
   };
 
   useEffect(() => {
@@ -49,6 +36,7 @@ export function OnboardingScreen() {
       return;
     }
 
+    fadeAnim.setValue(0);
     slideAnim.setValue(50);
     Animated.parallel([
       Animated.timing(fadeAnim, {
