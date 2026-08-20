@@ -9,7 +9,7 @@ import { Fraunces_600SemiBold } from '@expo-google-fonts/fraunces/600SemiBold';
 import { PublicSans_400Regular } from '@expo-google-fonts/public-sans/400Regular';
 import { PublicSans_600SemiBold } from '@expo-google-fonts/public-sans/600SemiBold';
 import { JetBrainsMono_500Medium } from '@expo-google-fonts/jetbrains-mono/500Medium';
-import { theme, colors } from '../constants/theme';
+import { theme, colors, isDarkMode } from '../constants/theme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -34,7 +34,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <PaperProvider theme={theme}>
-        <StatusBar style="light" />
+        <StatusBar style={isDarkMode ? 'light' : 'dark'} />
         <Stack
           screenOptions={{
             headerShown: false,

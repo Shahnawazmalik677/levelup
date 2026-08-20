@@ -1,4 +1,5 @@
-import { MD3DarkTheme, configureFonts } from 'react-native-paper';
+import { Appearance } from 'react-native';
+import { MD3DarkTheme, MD3LightTheme, configureFonts } from 'react-native-paper';
 
 const fontConfig = {
   displayLarge: { fontFamily: 'Fraunces_600SemiBold' },
@@ -18,10 +19,7 @@ const fontConfig = {
   labelSmall: { fontFamily: 'PublicSans_600SemiBold' },
 };
 
-// "Quiet Craft" palette: one neutral surface, one accent (brass gold).
-// Category/status differentiation comes from icon, form and label —
-// never from a second or third hue. See design-direction artifact.
-export const colors = {
+const darkColors = {
   background: '#121214',
   surface: '#1A1A1E',
   surfaceLight: '#222227',
@@ -41,15 +39,40 @@ export const colors = {
   overlay: 'rgba(0, 0, 0, 0.6)',
 };
 
-// For the handful of places digits need to line up (streaks, percentages).
+const lightColors = {
+  background: '#FAF8F5',
+  surface: '#FFFFFF',
+  surfaceLight: '#EDEAE2',
+  card: '#FFFFFF',
+  border: '#E6E1D6',
+
+  text: '#221F1A',
+  textSecondary: '#5C574C',
+  textMuted: '#8D8778',
+
+  primary: '#A9782E',
+  primaryLight: '#D8A34A',
+  primaryDark: '#7D5A22',
+  onPrimary: '#FFFFFF',
+
+  error: '#A6434B',
+  overlay: 'rgba(0, 0, 0, 0.5)',
+};
+
+export const isDarkMode = Appearance.getColorScheme() !== 'light';
+
+export const colors = isDarkMode ? darkColors : lightColors;
+
 export const fontFamilies = {
   numeric: 'JetBrainsMono_500Medium',
 };
 
+const baseTheme = isDarkMode ? MD3DarkTheme : MD3LightTheme;
+
 export const theme = {
-  ...MD3DarkTheme,
+  ...baseTheme,
   colors: {
-    ...MD3DarkTheme.colors,
+    ...baseTheme.colors,
     primary: colors.primary,
     secondary: colors.primary,
     background: colors.background,

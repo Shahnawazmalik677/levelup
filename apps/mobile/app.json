@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "automatic",
     "scheme": "levelup",
     "ios": {
       "supportsTablet": true
@@ -29,10 +29,14 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/icon.png",
+          "image": "./assets/android-icon-foreground.png",
           "imageWidth": 160,
           "resizeMode": "contain",
-          "backgroundColor": "#121214"
+          "backgroundColor": "#FAF8F5",
+          "dark": {
+            "image": "./assets/android-icon-foreground.png",
+            "backgroundColor": "#121214"
+          }
         }
       ]
     ],

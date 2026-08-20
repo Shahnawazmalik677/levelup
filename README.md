@@ -134,12 +134,19 @@ archiving rules), not the parts that would visibly break on first tap.
 
 ## Design
 
-Single neutral graphite surface + one accent (brass gold) — no per-hobby or
-per-status color-coding. Category identity comes from icon + label, technique
-status from ring *form* (locked/active/completed/skipped), difficulty from
-neutral badges — never from a second hue. Fraunces for headings, Public Sans
-for body/UI, JetBrains Mono for anything tabular (streaks, percentages,
-XP counts).
+One neutral surface + one accent (brass gold), in both a dark and a light
+variant — no per-hobby or per-status color-coding. Category identity comes
+from icon + label, technique status from ring *form*
+(locked/active/completed/skipped), difficulty from neutral badges — never
+from a second hue. Fraunces for headings, Public Sans for body/UI, JetBrains
+Mono for anything tabular (streaks, percentages, XP counts).
+
+The palette is picked from the device's system appearance setting
+(`Appearance.getColorScheme()`) once at launch — the light and dark palettes
+share the same accent hue at different lightness levels chosen for contrast
+in each context, rather than two unrelated color schemes. It's read once at
+startup rather than re-rendered live if the system theme changes mid-session,
+which was the deliberate tradeoff given the time available.
 
 Design direction took inspiration from **Habitify**, **Streaks**, and
 **Onrise** for the restrained, single-accent habit-tracking language, and from
