@@ -93,7 +93,7 @@ export function OnboardingScreen() {
       router.replace('/(tabs)');
     } catch (err) {
       console.error('Failed to generate plan:', err);
-      setError('Failed to generate your plan. Please try again.');
+      setError(err instanceof Error ? err.message : 'Failed to generate your plan. Please try again.');
       animateTransition('level');
     }
   };

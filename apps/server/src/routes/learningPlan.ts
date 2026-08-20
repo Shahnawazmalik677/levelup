@@ -27,15 +27,23 @@ learningPlanRouter.post(
         return;
       }
 
-      const techniques = await generateLearningPlan(hobby, level, preferences);
+      const plan = await generateLearningPlan(hobby, level, preferences);
+
+      if (!plan.isHobby) {
+        res.status(400).json({
+          success: false,
+          error: `"${hobby}" doesn't look like a hobby to learn - try something like chess, guitar, or cooking.`,
+        });
+        return;
+      }
 
       res.json({
         success: true,
         data: {
           id: uuidv4(),
-          hobby,
+          hobby: plan.hobby,
           level,
-          techniques,
+          techniques: plan.techniques,
           createdAt: new Date().toISOString(),
         },
       });

@@ -15,38 +15,60 @@ const model = genAI.getGenerativeModel({
 function buildPlanPrompt(hobby: string, level: SkillLevel, preferences?: string): string {
   const techniqueCount = level === 'curious' ? 5 : level === 'beginner' ? 6 : 8;
 
-  return `You are a ${hobby} instructor creating a structured learning plan for a ${level} level student.
+  return `A student typed the following into a "what hobby do you want to learn?" box: "${hobby}"
 
-Generate exactly ${techniqueCount} techniques to learn, ordered from easiest to most advanced.
+This may be phrased as a full sentence, a question, an abbreviation, or just a
+plain hobby name. First, identify the actual hobby or recreational skill they
+mean, and write it as a short, properly capitalized name (e.g. "I want to
+learn piano" -> "Piano", "chess" -> "Chess").
+
+Then decide whether it's actually a hobby - something people learn and
+practice for enjoyment or personal interest (this includes practical/domestic
+interests like cooking, gardening, or home DIY). It is NOT a hobby if it's a
+professional/trade service (e.g. "AC repair", "plumbing"), asking for advice
+on a one-off task (e.g. "how to do my taxes", "write my resume"), a
+homework/school question, or unrelated/nonsensical input.
+
+If it IS a hobby: as an instructor for it, create a structured learning plan
+for a ${level} level student: exactly ${techniqueCount} techniques, ordered
+from easiest to most advanced.
 
 ${preferences ? `Student context: ${preferences}` : ''}
 
-Return a JSON array where each element has:
-- "name": short technique name (2-4 words)
-- "description": what this technique is and how to do it (2-3 sentences)
-- "whyItMatters": why learning this is important for the student (1-2 sentences)
-- "estimatedTime": realistic time to learn (e.g., "2-3 hours", "1 week")
-- "difficulty": one of "easy", "medium", or "hard"
-- "practiceChecklist": array of 3-5 practice tasks, each with "text" (actionable task description)
-- "resources": empty array
+Return a single JSON object with:
+- "isHobby": true or false
+- "hobby": the cleaned-up hobby name (your best guess at what they meant, even if isHobby is false)
+- "techniques": if isHobby is true, an array where each element has:
+  - "name": short technique name (2-4 words)
+  - "description": what this technique is and how to do it (2-3 sentences)
+  - "whyItMatters": why learning this is important for the student (1-2 sentences)
+  - "estimatedTime": realistic time to learn (e.g., "2-3 hours", "1 week")
+  - "difficulty": one of "easy", "medium", or "hard"
+  - "practiceChecklist": array of 3-5 practice tasks, each with "text" (actionable task description)
+  - "resources": empty array
+  If isHobby is false, return an empty array.
 
 Example format:
-[
-  {
-    "name": "Basic Grip",
-    "description": "Learn the fundamental way to hold and control the instrument.",
-    "whyItMatters": "A proper grip is the foundation for all other techniques.",
-    "estimatedTime": "1-2 hours",
-    "difficulty": "easy",
-    "practiceChecklist": [
-      { "text": "Practice holding for 5 minutes" },
-      { "text": "Try switching between grips" }
-    ],
-    "resources": []
-  }
-]
+{
+  "isHobby": true,
+  "hobby": "Guitar",
+  "techniques": [
+    {
+      "name": "Basic Grip",
+      "description": "Learn the fundamental way to hold and control the instrument.",
+      "whyItMatters": "A proper grip is the foundation for all other techniques.",
+      "estimatedTime": "1-2 hours",
+      "difficulty": "easy",
+      "practiceChecklist": [
+        { "text": "Practice holding for 5 minutes" },
+        { "text": "Try switching between grips" }
+      ],
+      "resources": []
+    }
+  ]
+}
 
-Return ONLY the JSON array, no markdown or extra text.`;
+Return ONLY the JSON object, no markdown or extra text.`;
 }
 
 function buildSwapPrompt(
@@ -108,17 +130,37 @@ function formatTechnique(raw: RawTechnique, order: number, isFirst: boolean): Te
   };
 }
 
+interface RawPlan {
+  isHobby: boolean;
+  hobby: string;
+  techniques: RawTechnique[];
+}
+
+export type PlanResult =
+  | { isHobby: true; hobby: string; techniques: Technique[] }
+  | { isHobby: false; hobby: string };
+
 export async function generateLearningPlan(
   hobby: string,
   level: SkillLevel,
   preferences?: string
-): Promise<Technique[]> {
+): Promise<PlanResult> {
   const prompt = buildPlanPrompt(hobby, level, preferences);
   const result = await model.generateContent(prompt);
   const text = result.response.text();
-  const rawTechniques: RawTechnique[] = JSON.parse(text);
+  const rawPlan: RawPlan = JSON.parse(text);
 
-  return rawTechniques.map((raw, index) => formatTechnique(raw, index + 1, index === 0));
+  if (!rawPlan.isHobby) {
+    return { isHobby: false, hobby: rawPlan.hobby };
+  }
+
+  return {
+    isHobby: true,
+    hobby: rawPlan.hobby,
+    techniques: rawPlan.techniques.map((raw, index) =>
+      formatTechnique(raw, index + 1, index === 0)
+    ),
+  };
 }
 
 export async function generateSwapTechnique(
