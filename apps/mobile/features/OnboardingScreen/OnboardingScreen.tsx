@@ -8,7 +8,7 @@ import { LevelOption } from '../../components/LevelOption';
 import { colors } from '../../constants/theme';
 import { PRESET_HOBBIES } from '../../constants/hobbies';
 import { apiService } from '../../services/api';
-import { saveLearningPlan, setOnboardingComplete } from '../../store/storage';
+import { upsertLearningPlan, setOnboardingComplete } from '../../store/storage';
 import { styles } from './styles';
 
 type Step = 'hobby' | 'level' | 'loading';
@@ -80,7 +80,7 @@ export function OnboardingScreen() {
         level: selectedLevel,
       });
 
-      await saveLearningPlan({
+      await upsertLearningPlan({
         id: plan.id,
         hobby: plan.hobby,
         hobbyIcon: selectedHobby?.icon || '🎯',

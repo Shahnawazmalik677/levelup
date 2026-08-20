@@ -22,6 +22,10 @@ export const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginBottom: spacing.md,
   },
+  activeHobbiesHint: {
+    color: colors.textMuted,
+    marginBottom: spacing.md,
+  },
   hobbyScroll: {
     flex: 1,
   },

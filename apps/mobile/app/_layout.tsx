@@ -45,10 +45,18 @@ export default function RootLayout() {
         <Stack.Screen name="onboarding" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
-          name="technique/[id]"
+          name="technique/[planId]/[id]"
           options={{
             presentation: 'modal',
             animation: 'slide_from_bottom',
+          }}
+        />
+        <Stack.Screen
+          name="level-complete"
+          options={{
+            presentation: 'modal',
+            animation: 'fade',
+            gestureEnabled: false,
           }}
         />
       </Stack>

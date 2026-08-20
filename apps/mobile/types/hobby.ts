@@ -19,6 +19,15 @@ export type HobbyCategory =
 
 export type SkillLevel = 'curious' | 'beginner' | 'intermediate';
 
+export const SKILL_LEVEL_ORDER: SkillLevel[] = ['curious', 'beginner', 'intermediate'];
+
+export const getNextLevel = (level: SkillLevel): SkillLevel | null => {
+  const index = SKILL_LEVEL_ORDER.indexOf(level);
+  return index >= 0 && index < SKILL_LEVEL_ORDER.length - 1
+    ? SKILL_LEVEL_ORDER[index + 1]
+    : null;
+};
+
 export const SKILL_LEVEL_LABELS: Record<SkillLevel, { title: string; description: string }> = {
   curious: {
     title: 'Just Curious',

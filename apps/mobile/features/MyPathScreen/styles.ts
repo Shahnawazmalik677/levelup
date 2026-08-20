@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors, spacing } from '../../constants/theme';
+import { colors, spacing, borderRadius } from '../../constants/theme';
 
 export const styles = StyleSheet.create({
   container: {
@@ -41,5 +41,27 @@ export const styles = StyleSheet.create({
   headerSubtitle: {
     color: colors.textSecondary,
     textTransform: 'capitalize',
+  },
+  hobbySwitcher: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.md,
+  },
+  hobbyChip: {
+    color: colors.textSecondary,
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: borderRadius.full,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md,
+    overflow: 'hidden',
+  },
+  hobbyChipActive: {
+    color: colors.onPrimary,
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+    fontWeight: '600',
   },
 });

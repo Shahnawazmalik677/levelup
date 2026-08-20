@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -6,20 +6,21 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { SkillTree } from '../../components/SkillTree';
 import { StreakBadge } from '../../components/StreakBadge';
 import { EmptyState } from '../../components/EmptyState';
-import { useLearningPlan } from '../../hooks/useLearningPlan';
+import { useLearningPlans } from '../../hooks/useLearningPlans';
 import { useStreak } from '../../hooks/useStreak';
 import { styles } from './styles';
 
 export function MyPathScreen() {
   const router = useRouter();
-  const { plan, loading, refreshPlan } = useLearningPlan();
+  const { plans, loading, refreshPlans } = useLearningPlans();
   const { streak, refreshStreak } = useStreak();
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
 
   useFocusEffect(
     useCallback(() => {
-      refreshPlan(true);
+      refreshPlans(true);
       refreshStreak(true);
-    }, [refreshPlan, refreshStreak])
+    }, [refreshPlans, refreshStreak])
   );
 
   if (loading) {
@@ -34,7 +35,7 @@ export function MyPathScreen() {
     );
   }
 
-  if (!plan) {
+  if (plans.length === 0) {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
         <EmptyState
@@ -47,6 +48,8 @@ export function MyPathScreen() {
       </SafeAreaView>
     );
   }
+
+  const plan = plans.find((p) => p.id === selectedPlanId) || plans[0];
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -75,12 +78,34 @@ export function MyPathScreen() {
           />
         </View>
 
+        {/* Hobby switcher */}
+        {plans.length > 1 && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.hobbySwitcher}
+          >
+            {plans.map((p) => (
+              <Text
+                key={p.id}
+                onPress={() => setSelectedPlanId(p.id)}
+                style={[
+                  styles.hobbyChip,
+                  p.id === plan.id && styles.hobbyChipActive,
+                ]}
+              >
+                {p.hobbyIcon} {p.hobby}
+              </Text>
+            ))}
+          </ScrollView>
+        )}
+
         {/* Skill Tree */}
         <SkillTree
           techniques={plan.techniques}
           onTechniquePress={(technique) => {
             if (technique.status !== 'locked') {
-              router.push(`/technique/${technique.id}`);
+              router.push(`/technique/${plan.id}/${technique.id}`);
             }
           }}
         />

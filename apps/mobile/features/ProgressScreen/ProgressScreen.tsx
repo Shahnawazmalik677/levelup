@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, ScrollView } from 'react-native';
 import { Text, Button, ProgressBar } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -6,21 +6,31 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { StatCard } from '../../components/StatCard';
 import { StreakBadge } from '../../components/StreakBadge';
 import { EmptyState } from '../../components/EmptyState';
-import { useLearningPlan } from '../../hooks/useLearningPlan';
+import { ConfirmDialog } from '../../components/ConfirmDialog';
+import { SkillLevel, SKILL_LEVEL_LABELS } from '../../types';
+import { useLearningPlans } from '../../hooks/useLearningPlans';
 import { useStreak } from '../../hooks/useStreak';
+import { useMasteredHobbies } from '../../hooks/useMasteredHobbies';
+import { useLevelHistory } from '../../hooks/useLevelHistory';
 import { colors } from '../../constants/theme';
 import { styles } from './styles';
 
 export function ProgressScreen() {
   const router = useRouter();
-  const { plan, loading, resetPlan, refreshPlan } = useLearningPlan();
+  const { plans, loading, removePlan, refreshPlans } = useLearningPlans();
   const { streak, refreshStreak } = useStreak();
+  const { masteredHobbies, refreshMasteredHobbies } = useMasteredHobbies();
+  const { levelHistory, refreshLevelHistory } = useLevelHistory();
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [removeDialogVisible, setRemoveDialogVisible] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
-      refreshPlan(true);
+      refreshPlans(true);
       refreshStreak(true);
-    }, [refreshPlan, refreshStreak])
+      refreshMasteredHobbies(true);
+      refreshLevelHistory(true);
+    }, [refreshPlans, refreshStreak, refreshMasteredHobbies, refreshLevelHistory])
   );
 
   if (loading) {
@@ -33,7 +43,25 @@ export function ProgressScreen() {
     );
   }
 
-  if (!plan) {
+  const masteredSection = masteredHobbies.length > 0 && (
+    <View style={styles.masteredSection}>
+      <Text variant="titleMedium" style={styles.sectionTitle}>
+        🏆 Mastered
+      </Text>
+      <View style={styles.masteredRow}>
+        {masteredHobbies.map((hobby) => (
+          <View key={hobby.hobby} style={styles.masteredChip}>
+            <Text style={styles.masteredChipIcon}>{hobby.hobbyIcon}</Text>
+            <Text variant="bodyMedium" style={styles.masteredChipLabel}>
+              {hobby.hobby}
+            </Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+
+  if (plans.length === 0) {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
         <EmptyState
@@ -43,9 +71,12 @@ export function ProgressScreen() {
           actionLabel="Pick a Hobby"
           onAction={() => router.push('/onboarding')}
         />
+        {masteredSection}
       </SafeAreaView>
     );
   }
+
+  const plan = plans.find((p) => p.id === selectedPlanId) || plans[0];
 
   const completed = plan.techniques.filter((t) => t.status === 'completed').length;
   const skipped = plan.techniques.filter((t) => t.status === 'skipped').length;
@@ -53,6 +84,10 @@ export function ProgressScreen() {
   const total = plan.techniques.length;
   const effectiveTotal = total - skipped;
   const overallProgress = effectiveTotal > 0 ? completed / effectiveTotal : 0;
+
+  const pastLevels = levelHistory
+    .filter((entry) => entry.hobby.toLowerCase() === plan.hobby.toLowerCase())
+    .sort((a, b) => new Date(b.endedAt).getTime() - new Date(a.endedAt).getTime());
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -76,7 +111,7 @@ export function ProgressScreen() {
 
         {/* Stats grid */}
         <View style={styles.statsGrid}>
-          <StatCard icon="✅" value={completed} label="Completed" />
+          <StatCard icon="✅" value={streak.techniquesCompleted} label="Completed" />
           <StatCard icon="⭐" value={streak.totalXp} label="Total XP" />
         </View>
 
@@ -84,6 +119,28 @@ export function ProgressScreen() {
           <StatCard icon="🔥" value={streak.longestStreak} label="Best Streak" />
           <StatCard icon="📚" value={active} label="In Progress" />
         </View>
+
+        {/* Hobby switcher */}
+        {plans.length > 1 && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.hobbySwitcher}
+          >
+            {plans.map((p) => (
+              <Text
+                key={p.id}
+                onPress={() => setSelectedPlanId(p.id)}
+                style={[
+                  styles.hobbyChip,
+                  p.id === plan.id && styles.hobbyChipActive,
+                ]}
+              >
+                {p.hobbyIcon} {p.hobby}
+              </Text>
+            ))}
+          </ScrollView>
+        )}
 
         {/* Overall progress */}
         <View style={styles.overallSection}>
@@ -104,6 +161,34 @@ export function ProgressScreen() {
             style={styles.progressBar}
           />
         </View>
+
+        {/* Level history */}
+        {pastLevels.length > 0 && (
+          <View style={styles.historySection}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>
+              Level History
+            </Text>
+            {pastLevels.map((entry) => (
+              <View key={`${entry.level}-${entry.endedAt}`} style={styles.historyRow}>
+                <Text style={styles.historyIcon}>{entry.hobbyIcon}</Text>
+                <View style={styles.historyInfo}>
+                  <Text variant="bodyMedium" style={styles.historyLevel}>
+                    {SKILL_LEVEL_LABELS[entry.level as SkillLevel]?.title || entry.level}
+                  </Text>
+                  <Text variant="bodySmall" style={styles.historyDate}>
+                    {new Date(entry.endedAt).toLocaleDateString(undefined, {
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </Text>
+                </View>
+                <Text variant="bodySmall" style={styles.historyCount}>
+                  {entry.completed}/{entry.total}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
 
         {/* Technique breakdown */}
         <View style={styles.breakdownSection}>
@@ -148,19 +233,33 @@ export function ProgressScreen() {
           ))}
         </View>
 
-        {/* Reset */}
+        {masteredSection}
+
+        {/* Remove this hobby */}
         <Button
           mode="outlined"
-          onPress={() => {
-            resetPlan();
-            router.replace('/onboarding');
-          }}
+          onPress={() => setRemoveDialogVisible(true)}
           style={styles.resetButton}
           textColor={colors.error}
         >
-          Start Over with New Hobby
+          Remove {plan.hobby}
         </Button>
       </ScrollView>
+
+      <ConfirmDialog
+        visible={removeDialogVisible}
+        title={`Remove ${plan.hobby}?`}
+        message={`This clears your ${plan.hobby} plan and progress. Your streak, XP, level history, and mastered hobbies aren't affected — and neither are your other active hobbies.`}
+        confirmLabel="Remove"
+        cancelLabel="Cancel"
+        destructive
+        onConfirm={() => {
+          setRemoveDialogVisible(false);
+          setSelectedPlanId(null);
+          removePlan(plan.id);
+        }}
+        onDismiss={() => setRemoveDialogVisible(false)}
+      />
     </SafeAreaView>
   );
 }

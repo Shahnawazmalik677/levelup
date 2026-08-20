@@ -10,20 +10,20 @@ import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { colors } from '../../constants/theme';
 import { PRESET_HOBBIES } from '../../constants/hobbies';
 import { apiService } from '../../services/api';
-import { saveLearningPlan, setOnboardingComplete } from '../../store/storage';
-import { useLearningPlan } from '../../hooks/useLearningPlan';
+import { upsertLearningPlan, setOnboardingComplete, MAX_CONCURRENT_PLANS } from '../../store/storage';
+import { useLearningPlans } from '../../hooks/useLearningPlans';
 import { styles } from './styles';
 
 type Step = 'hobby' | 'level' | 'loading';
 
 export function ExploreScreen() {
   const router = useRouter();
-  const { plan, refreshPlan } = useLearningPlan();
+  const { plans, refreshPlans } = useLearningPlans();
 
   useFocusEffect(
     useCallback(() => {
-      refreshPlan(true);
-    }, [refreshPlan])
+      refreshPlans(true);
+    }, [refreshPlans])
   );
 
   const [step, setStep] = useState<Step>('hobby');
@@ -32,6 +32,11 @@ export function ExploreScreen() {
   const [selectedLevel, setSelectedLevel] = useState<SkillLevel | null>(null);
   const [error, setError] = useState('');
   const [confirmReplaceVisible, setConfirmReplaceVisible] = useState(false);
+
+  const hobbyName = selectedHobby?.name || customHobby.trim();
+  const existingPlan = plans.find(
+    (p) => p.hobby.toLowerCase() === hobbyName.toLowerCase()
+  );
 
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -80,13 +85,22 @@ export function ExploreScreen() {
       setError('Pick your skill level');
       return;
     }
-    setError('');
 
-    if (plan) {
+    if (existingPlan) {
+      setError('');
       setConfirmReplaceVisible(true);
-    } else {
-      generatePlan();
+      return;
     }
+
+    if (plans.length >= MAX_CONCURRENT_PLANS) {
+      setError(
+        `You're already tracking ${MAX_CONCURRENT_PLANS} hobbies at once. Finish or remove one before adding another.`
+      );
+      return;
+    }
+
+    setError('');
+    generatePlan();
   };
 
   const generatePlan = async () => {
@@ -94,15 +108,13 @@ export function ExploreScreen() {
 
     animateTransition('loading');
 
-    const hobbyName = selectedHobby?.name || customHobby.trim();
-
     try {
       const result = await apiService.generateLearningPlan({
         hobby: hobbyName,
         level: selectedLevel,
       });
 
-      await saveLearningPlan({
+      await upsertLearningPlan({
         id: result.id,
         hobby: result.hobby,
         hobbyIcon: selectedHobby?.icon || '🎯',
@@ -112,7 +124,7 @@ export function ExploreScreen() {
       });
 
       await setOnboardingComplete();
-      await refreshPlan();
+      await refreshPlans();
 
       setSelectedHobby(null);
       setCustomHobby('');
@@ -133,6 +145,12 @@ export function ExploreScreen() {
       <Text variant="bodyLarge" style={styles.subtitle}>
         Pick a new hobby to learn
       </Text>
+
+      {plans.length > 0 && (
+        <Text variant="bodySmall" style={styles.activeHobbiesHint}>
+          Currently learning: {plans.map((p) => `${p.hobbyIcon} ${p.hobby}`).join('  ·  ')}
+        </Text>
+      )}
 
       <ScrollView
         style={styles.hobbyScroll}
@@ -277,9 +295,9 @@ export function ExploreScreen() {
 
       <ConfirmDialog
         visible={confirmReplaceVisible}
-        title="Start New Hobby?"
-        message={`This will replace your current ${plan?.hobby} learning plan. Are you sure?`}
-        confirmLabel="Yes, Start Fresh"
+        title="Replace This Plan?"
+        message={`You already have a ${existingPlan?.level} plan for ${existingPlan?.hobby}. Generating a new one will replace it. Are you sure?`}
+        confirmLabel="Yes, Replace It"
         cancelLabel="Cancel"
         onConfirm={() => {
           setConfirmReplaceVisible(false);

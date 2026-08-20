@@ -14,23 +14,26 @@ import { VideoCard } from '../../components/VideoCard';
 import { ChecklistItem } from '../../components/ChecklistItem';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { CompletionCelebration } from '../../components/CompletionCelebration';
-import { useLearningPlan } from '../../hooks/useLearningPlan';
+import { useLearningPlans } from '../../hooks/useLearningPlans';
 import { useStreak } from '../../hooks/useStreak';
 import { apiService } from '../../services/api';
+import { isPlanComplete } from '../../store/storage';
 import { colors } from '../../constants/theme';
 import { styles } from './styles';
 
 export function TechniqueDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { planId, id } = useLocalSearchParams<{ planId: string; id: string }>();
   const router = useRouter();
   const {
-    plan,
+    plans,
     toggleChecklistItem,
     markTechniqueComplete,
     skipTechnique,
     swapTechnique,
-  } = useLearningPlan();
+  } = useLearningPlans();
   const { recordActivity, recordTechniqueCompletion } = useStreak();
+
+  const plan = plans.find((p) => p.id === planId);
 
   const [videos, setVideos] = useState<VideoResult[]>([]);
   const [loadingVideos, setLoadingVideos] = useState(true);
@@ -68,8 +71,8 @@ export function TechniqueDetailScreen() {
   };
 
   const handleToggleChecklist = async (itemId: string) => {
-    if (!technique) return;
-    await toggleChecklistItem(technique.id, itemId);
+    if (!technique || !plan) return;
+    await toggleChecklistItem(plan.id, technique.id, itemId);
     await recordActivity(5);
   };
 
@@ -79,7 +82,7 @@ export function TechniqueDetailScreen() {
   };
 
   const confirmComplete = async () => {
-    if (!technique) return;
+    if (!technique || !plan) return;
     setCompleteDialogVisible(false);
     setCelebrating(true);
 
@@ -88,13 +91,19 @@ export function TechniqueDetailScreen() {
     // return — otherwise the back-navigation can land on stale/half-written data.
     const minDelay = new Promise<void>((resolve) => setTimeout(resolve, 1300));
     const persist = (async () => {
-      await markTechniqueComplete(technique.id);
+      const updatedPlan = await markTechniqueComplete(plan.id, technique.id);
       await recordActivity(50);
       await recordTechniqueCompletion();
+      return updatedPlan;
     })();
 
-    await Promise.all([minDelay, persist]);
-    router.back();
+    const [, updatedPlan] = await Promise.all([minDelay, persist]);
+
+    if (updatedPlan && isPlanComplete(updatedPlan)) {
+      router.replace({ pathname: '/level-complete', params: { planId: plan.id } });
+    } else {
+      router.back();
+    }
   };
 
   const handleSkip = () => {
@@ -103,9 +112,9 @@ export function TechniqueDetailScreen() {
   };
 
   const confirmSkip = async () => {
-    if (!technique) return;
+    if (!technique || !plan) return;
     setSkipDialogVisible(false);
-    await skipTechnique(technique.id);
+    await skipTechnique(plan.id, technique.id);
     router.back();
   };
 
@@ -121,7 +130,7 @@ export function TechniqueDetailScreen() {
         existingTechniques: plan.techniques.map((t) => t.name),
       });
 
-      await swapTechnique(technique.id, result.technique);
+      await swapTechnique(plan.id, technique.id, result.technique);
       setSwapResultDialog({
         visible: true,
         title: 'Swapped!',
