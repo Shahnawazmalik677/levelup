@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { PaperProvider } from 'react-native-paper';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts, Fraunces_600SemiBold } from '@expo-google-fonts/fraunces';
@@ -32,34 +33,36 @@ export default function RootLayout() {
   }
 
   return (
-    <PaperProvider theme={theme}>
-      <StatusBar style="light" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: colors.background },
-          animation: 'slide_from_right',
-        }}
-      >
-        <Stack.Screen name="index" />
-        <Stack.Screen name="onboarding" />
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen
-          name="technique/[planId]/[id]"
-          options={{
-            presentation: 'modal',
-            animation: 'slide_from_bottom',
+    <SafeAreaProvider>
+      <PaperProvider theme={theme}>
+        <StatusBar style="light" />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: colors.background },
+            animation: 'slide_from_right',
           }}
-        />
-        <Stack.Screen
-          name="level-complete"
-          options={{
-            presentation: 'modal',
-            animation: 'fade',
-            gestureEnabled: false,
-          }}
-        />
-      </Stack>
-    </PaperProvider>
+        >
+          <Stack.Screen name="index" />
+          <Stack.Screen name="onboarding" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen
+            name="technique/[planId]/[id]"
+            options={{
+              presentation: 'modal',
+              animation: 'slide_from_bottom',
+            }}
+          />
+          <Stack.Screen
+            name="level-complete"
+            options={{
+              presentation: 'modal',
+              animation: 'fade',
+              gestureEnabled: false,
+            }}
+          />
+        </Stack>
+      </PaperProvider>
+    </SafeAreaProvider>
   );
 }
