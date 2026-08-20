@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { View, Animated, Image } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { isOnboardingComplete } from '../../store/storage';
 import { apiService } from '../../services/api';
 import { styles } from './styles';
@@ -61,7 +62,7 @@ export function IntroScreen() {
   }, [router, converge, markScale, textOpacity, textTranslateY]);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.convergeArea}>
         {CONVERGING_ICONS.map((icon, i) => {
           const { dx, dy } = iconOffsets[i];
@@ -118,6 +119,6 @@ export function IntroScreen() {
           Master any hobby, technique by technique.
         </Text>
       </Animated.View>
-    </View>
+    </SafeAreaView>
   );
 }

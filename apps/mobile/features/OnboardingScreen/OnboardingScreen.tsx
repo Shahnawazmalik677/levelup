@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { View, ScrollView, Animated } from 'react-native';
 import { Text, Button, TextInput, ActivityIndicator } from 'react-native-paper';
 import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { SkillLevel, SKILL_LEVEL_LABELS } from '../../types';
 import { HobbyCard } from '../../components/HobbyCard';
 import { LevelOption } from '../../components/LevelOption';
@@ -233,7 +234,7 @@ export function OnboardingScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Animated.View
         style={[
           styles.animatedContainer,
@@ -247,6 +248,6 @@ export function OnboardingScreen() {
         {step === 'level' && renderLevelStep()}
         {step === 'loading' && renderLoadingStep()}
       </Animated.View>
-    </View>
+    </SafeAreaView>
   );
 }
