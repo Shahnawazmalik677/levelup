@@ -71,7 +71,9 @@ export const replaceTechnique = async (
   if (!plan) return null;
 
   plan.techniques = plan.techniques.map((t) =>
-    t.id === oldTechniqueId ? { ...newTechnique, order: t.order, status: t.status } : t
+    t.id === oldTechniqueId
+      ? { ...newTechnique, id: t.id, order: t.order, status: t.status }
+      : t
   );
 
   await saveLearningPlan(plan);
