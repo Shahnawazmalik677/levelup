@@ -43,6 +43,12 @@ export function ProgressScreen() {
     );
   }
 
+  const pastLevels = [...levelHistory].sort(
+    (a, b) => new Date(b.endedAt).getTime() - new Date(a.endedAt).getTime()
+  );
+
+  // Both permanent, cross-hobby records - unaffected by whichever hobby is
+  // selected below, so they're rendered above the switcher, not below it.
   const masteredSection = masteredHobbies.length > 0 && (
     <View style={styles.masteredSection}>
       <Text variant="titleMedium" style={styles.sectionTitle}>
@@ -61,6 +67,33 @@ export function ProgressScreen() {
     </View>
   );
 
+  const levelHistorySection = pastLevels.length > 0 && (
+    <View style={styles.historySection}>
+      <Text variant="titleMedium" style={styles.sectionTitle}>
+        Level History
+      </Text>
+      {pastLevels.map((entry) => (
+        <View key={`${entry.level}-${entry.endedAt}`} style={styles.historyRow}>
+          <Text style={styles.historyIcon}>{entry.hobbyIcon}</Text>
+          <View style={styles.historyInfo}>
+            <Text variant="bodyMedium" style={styles.historyLevel}>
+              {entry.hobby} · {SKILL_LEVEL_LABELS[entry.level].title}
+            </Text>
+            <Text variant="bodySmall" style={styles.historyDate}>
+              {new Date(entry.endedAt).toLocaleDateString(undefined, {
+                month: 'short',
+                day: 'numeric',
+              })}
+            </Text>
+          </View>
+          <Text variant="bodySmall" style={styles.historyCount}>
+            {entry.completed}/{entry.total}
+          </Text>
+        </View>
+      ))}
+    </View>
+  );
+
   if (plans.length === 0) {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -72,6 +105,7 @@ export function ProgressScreen() {
           onAction={() => router.push('/onboarding')}
         />
         {masteredSection}
+        {levelHistorySection}
       </SafeAreaView>
     );
   }
@@ -84,10 +118,6 @@ export function ProgressScreen() {
   const total = plan.techniques.length;
   const effectiveTotal = total - skipped;
   const overallProgress = effectiveTotal > 0 ? completed / effectiveTotal : 0;
-
-  const pastLevels = [...levelHistory].sort(
-    (a, b) => new Date(b.endedAt).getTime() - new Date(a.endedAt).getTime()
-  );
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -119,6 +149,11 @@ export function ProgressScreen() {
           <StatCard icon="🔥" value={streak.longestStreak} label="Best Streak" />
           <StatCard icon="📚" value={active} label="In Progress" />
         </View>
+
+        {levelHistorySection}
+        {masteredSection}
+
+        {/* Everything below this point is scoped to whichever hobby is selected */}
 
         {/* Hobby switcher */}
         {plans.length > 1 && (
@@ -204,36 +239,6 @@ export function ProgressScreen() {
             </View>
           ))}
         </View>
-
-        {/* Level history — across every hobby, not just the one selected above */}
-        {pastLevels.length > 0 && (
-          <View style={styles.historySection}>
-            <Text variant="titleMedium" style={styles.sectionTitle}>
-              Level History
-            </Text>
-            {pastLevels.map((entry) => (
-              <View key={`${entry.level}-${entry.endedAt}`} style={styles.historyRow}>
-                <Text style={styles.historyIcon}>{entry.hobbyIcon}</Text>
-                <View style={styles.historyInfo}>
-                  <Text variant="bodyMedium" style={styles.historyLevel}>
-                    {entry.hobby} · {SKILL_LEVEL_LABELS[entry.level].title}
-                  </Text>
-                  <Text variant="bodySmall" style={styles.historyDate}>
-                    {new Date(entry.endedAt).toLocaleDateString(undefined, {
-                      month: 'short',
-                      day: 'numeric',
-                    })}
-                  </Text>
-                </View>
-                <Text variant="bodySmall" style={styles.historyCount}>
-                  {entry.completed}/{entry.total}
-                </Text>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {masteredSection}
 
         {/* Remove this hobby */}
         <Button
