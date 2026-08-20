@@ -45,9 +45,12 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     marginBottom: spacing.md,
   },
-  levelOptions: {
+  levelOptionsScroll: {
     flex: 1,
+  },
+  levelOptions: {
     paddingTop: spacing.md,
+    paddingBottom: spacing.md,
   },
   error: {
     color: colors.error,

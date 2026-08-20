@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
   stepContainer: {
     flex: 1,
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xxl + spacing.lg,
+    paddingTop: spacing.lg,
   },
   title: {
     color: colors.text,
@@ -41,9 +41,12 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     marginBottom: spacing.md,
   },
-  levelOptions: {
+  levelOptionsScroll: {
     flex: 1,
+  },
+  levelOptions: {
     paddingTop: spacing.md,
+    paddingBottom: spacing.md,
   },
   error: {
     color: colors.error,
@@ -54,7 +57,7 @@ export const styles = StyleSheet.create({
     height: 48,
     justifyContent: 'center',
     borderRadius: borderRadius.md,
-    marginBottom: spacing.xl,
+    marginBottom: spacing.md,
   },
   backButton: {
     height: 48,
@@ -73,7 +76,7 @@ export const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: 'row',
     alignItems: 'stretch',
-    marginBottom: spacing.xl,
+    marginBottom: spacing.md,
   },
   loadingContainer: {
     flex: 1,

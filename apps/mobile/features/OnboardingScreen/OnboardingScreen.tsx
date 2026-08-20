@@ -171,7 +171,11 @@ export function OnboardingScreen() {
         This decides the complexity of your {selectedHobby?.name || customHobby} techniques
       </Text>
 
-      <View style={styles.levelOptions}>
+      <ScrollView
+        style={styles.levelOptionsScroll}
+        contentContainerStyle={styles.levelOptions}
+        showsVerticalScrollIndicator={false}
+      >
         {(Object.entries(SKILL_LEVEL_LABELS) as [SkillLevel, { title: string; description: string }][]).map(
           ([key, { title, description }]) => (
             <LevelOption
@@ -187,7 +191,7 @@ export function OnboardingScreen() {
             />
           )
         )}
-      </View>
+      </ScrollView>
 
       {error ? (
         <Text variant="bodySmall" style={styles.error}>{error}</Text>
