@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Alert } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import {
   Text,
   Button,
@@ -12,6 +12,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { VideoResult } from '../../types';
 import { VideoCard } from '../../components/VideoCard';
 import { ChecklistItem } from '../../components/ChecklistItem';
+import { ConfirmDialog } from '../../components/ConfirmDialog';
+import { CompletionCelebration } from '../../components/CompletionCelebration';
 import { useLearningPlan } from '../../hooks/useLearningPlan';
 import { useStreak } from '../../hooks/useStreak';
 import { apiService } from '../../services/api';
@@ -33,6 +35,14 @@ export function TechniqueDetailScreen() {
   const [videos, setVideos] = useState<VideoResult[]>([]);
   const [loadingVideos, setLoadingVideos] = useState(true);
   const [swapping, setSwapping] = useState(false);
+  const [completeDialogVisible, setCompleteDialogVisible] = useState(false);
+  const [celebrating, setCelebrating] = useState(false);
+  const [skipDialogVisible, setSkipDialogVisible] = useState(false);
+  const [swapResultDialog, setSwapResultDialog] = useState<{
+    visible: boolean;
+    title: string;
+    message: string;
+  }>({ visible: false, title: '', message: '' });
 
   const technique = plan?.techniques.find((t) => t.id === id);
 
@@ -40,7 +50,7 @@ export function TechniqueDetailScreen() {
     if (technique && plan) {
       loadVideos();
     }
-  }, [technique?.id]);
+  }, [technique?.id, technique?.name]);
 
   const loadVideos = async () => {
     if (!technique || !plan) return;
@@ -63,45 +73,40 @@ export function TechniqueDetailScreen() {
     await recordActivity(5);
   };
 
-  const handleComplete = async () => {
+  const handleComplete = () => {
     if (!technique) return;
-
-    Alert.alert(
-      'Mark as Complete?',
-      `Great job mastering "${technique.name}"! You'll earn 50 XP.`,
-      [
-        { text: 'Not Yet', style: 'cancel' },
-        {
-          text: 'Complete!',
-          onPress: async () => {
-            await markTechniqueComplete(technique.id);
-            await recordActivity(50);
-            await recordTechniqueCompletion();
-            router.back();
-          },
-        },
-      ]
-    );
+    setCompleteDialogVisible(true);
   };
 
-  const handleSkip = async () => {
+  const confirmComplete = async () => {
     if (!technique) return;
+    setCompleteDialogVisible(false);
+    setCelebrating(true);
 
-    Alert.alert(
-      'Skip this technique?',
-      `"${technique.name}" will be struck through and the next one unlocked.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Skip',
-          style: 'destructive',
-          onPress: async () => {
-            await skipTechnique(technique.id);
-            router.back();
-          },
-        },
-      ]
-    );
+    // Hold the celebration for a beat so it reads as an intentional moment,
+    // and so every write below is fully settled before My Path refetches on
+    // return — otherwise the back-navigation can land on stale/half-written data.
+    const minDelay = new Promise<void>((resolve) => setTimeout(resolve, 1300));
+    const persist = (async () => {
+      await markTechniqueComplete(technique.id);
+      await recordActivity(50);
+      await recordTechniqueCompletion();
+    })();
+
+    await Promise.all([minDelay, persist]);
+    router.back();
+  };
+
+  const handleSkip = () => {
+    if (!technique) return;
+    setSkipDialogVisible(true);
+  };
+
+  const confirmSkip = async () => {
+    if (!technique) return;
+    setSkipDialogVisible(false);
+    await skipTechnique(technique.id);
+    router.back();
   };
 
   const handleSwap = async () => {
@@ -117,9 +122,17 @@ export function TechniqueDetailScreen() {
       });
 
       await swapTechnique(technique.id, result.technique);
-      Alert.alert('Swapped!', `Replaced with "${result.technique.name}"`);
+      setSwapResultDialog({
+        visible: true,
+        title: 'Swapped!',
+        message: `Replaced with "${result.technique.name}"`,
+      });
     } catch (error) {
-      Alert.alert('Error', 'Failed to find a replacement. Try again.');
+      setSwapResultDialog({
+        visible: true,
+        title: 'Error',
+        message: 'Failed to find a replacement. Try again.',
+      });
     } finally {
       setSwapping(false);
     }
@@ -293,6 +306,43 @@ export function TechniqueDetailScreen() {
           </Text>
         </View>
       )}
+
+      <CompletionCelebration
+        visible={celebrating}
+        title="Technique Mastered!"
+        subtitle={technique.name}
+        xpLabel="+50 XP"
+      />
+
+      <ConfirmDialog
+        visible={completeDialogVisible}
+        title="Mark as Complete?"
+        message={`Great job mastering "${technique.name}"! You'll earn 50 XP.`}
+        confirmLabel="Complete!"
+        cancelLabel="Not Yet"
+        onConfirm={confirmComplete}
+        onDismiss={() => setCompleteDialogVisible(false)}
+      />
+
+      <ConfirmDialog
+        visible={skipDialogVisible}
+        title="Skip this technique?"
+        message={`"${technique.name}" will be struck through and the next one unlocked.`}
+        confirmLabel="Skip"
+        cancelLabel="Cancel"
+        destructive
+        onConfirm={confirmSkip}
+        onDismiss={() => setSkipDialogVisible(false)}
+      />
+
+      <ConfirmDialog
+        visible={swapResultDialog.visible}
+        title={swapResultDialog.title}
+        message={swapResultDialog.message}
+        confirmLabel="OK"
+        onConfirm={() => setSwapResultDialog((prev) => ({ ...prev, visible: false }))}
+        onDismiss={() => setSwapResultDialog((prev) => ({ ...prev, visible: false }))}
+      />
     </SafeAreaView>
   );
 }

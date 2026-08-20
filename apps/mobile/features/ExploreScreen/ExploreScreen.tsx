@@ -1,11 +1,12 @@
-import React, { useState, useRef } from 'react';
-import { View, ScrollView, Animated, Alert } from 'react-native';
+import React, { useState, useRef, useCallback } from 'react';
+import { View, ScrollView, Animated } from 'react-native';
 import { Text, Button, TextInput, ActivityIndicator } from 'react-native-paper';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SkillLevel, SKILL_LEVEL_LABELS } from '../../types';
 import { HobbyCard } from '../../components/HobbyCard';
 import { LevelOption } from '../../components/LevelOption';
+import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { colors } from '../../constants/theme';
 import { PRESET_HOBBIES } from '../../constants/hobbies';
 import { apiService } from '../../services/api';
@@ -18,11 +19,19 @@ type Step = 'hobby' | 'level' | 'loading';
 export function ExploreScreen() {
   const router = useRouter();
   const { plan, refreshPlan } = useLearningPlan();
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshPlan(true);
+    }, [refreshPlan])
+  );
+
   const [step, setStep] = useState<Step>('hobby');
   const [selectedHobby, setSelectedHobby] = useState<typeof PRESET_HOBBIES[0] | null>(null);
   const [customHobby, setCustomHobby] = useState('');
   const [selectedLevel, setSelectedLevel] = useState<SkillLevel | null>(null);
   const [error, setError] = useState('');
+  const [confirmReplaceVisible, setConfirmReplaceVisible] = useState(false);
 
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -74,14 +83,7 @@ export function ExploreScreen() {
     setError('');
 
     if (plan) {
-      Alert.alert(
-        'Start New Hobby?',
-        `This will replace your current ${plan.hobby} learning plan. Are you sure?`,
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Yes, Start Fresh', onPress: generatePlan },
-        ]
-      );
+      setConfirmReplaceVisible(true);
     } else {
       generatePlan();
     }
@@ -226,6 +228,7 @@ export function ExploreScreen() {
           onPress={() => animateTransition('hobby')}
           style={styles.backButton}
           labelStyle={styles.buttonLabel}
+          contentStyle={styles.buttonContent}
           textColor={colors.textSecondary}
         >
           Back
@@ -271,6 +274,19 @@ export function ExploreScreen() {
         {step === 'level' && renderLevelStep()}
         {step === 'loading' && renderLoadingStep()}
       </Animated.View>
+
+      <ConfirmDialog
+        visible={confirmReplaceVisible}
+        title="Start New Hobby?"
+        message={`This will replace your current ${plan?.hobby} learning plan. Are you sure?`}
+        confirmLabel="Yes, Start Fresh"
+        cancelLabel="Cancel"
+        onConfirm={() => {
+          setConfirmReplaceVisible(false);
+          generatePlan();
+        }}
+        onDismiss={() => setConfirmReplaceVisible(false)}
+      />
     </SafeAreaView>
   );
 }

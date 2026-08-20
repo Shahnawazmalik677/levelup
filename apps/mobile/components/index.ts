@@ -7,3 +7,5 @@ export { ChecklistItem } from './ChecklistItem';
 export { StatCard } from './StatCard';
 export { StreakBadge } from './StreakBadge';
 export { EmptyState } from './EmptyState';
+export { ConfirmDialog } from './ConfirmDialog';
+export { CompletionCelebration } from './CompletionCelebration';
