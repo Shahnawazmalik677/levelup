@@ -3,6 +3,7 @@ import { SkillLevel, Technique } from '../types';
 
 const KEYS = {
   LEARNING_PLANS: 'learning_plans',
+  ACTIVE_PLAN_ID: 'active_plan_id',
   STREAK: 'streak_data',
   ONBOARDING_COMPLETE: 'onboarding_complete',
   MASTERED_HOBBIES: 'mastered_hobbies',
@@ -50,14 +51,9 @@ export interface StreakData {
 export const getLevelHistory = async (): Promise<LevelHistoryEntry[]> => {
   const data = await AsyncStorage.getItem(KEYS.LEVEL_HISTORY);
   const entries: LevelHistoryEntry[] = data ? JSON.parse(data) : [];
-  // Filters out entries written before archiving required completion, so
-  // already-stored abandoned plans stop showing up without a migration.
   return entries.filter((e) => e.total > 0 && e.completed + e.skipped === e.total);
 };
 
-// Snapshots a plan into Level History before it's replaced or removed — but
-// only if it was actually finished. An abandoned/untouched plan isn't a real
-// record of anything, so it's dropped rather than logged as noise.
 const archiveLevel = async (plan: LearningPlanData): Promise<void> => {
   if (!isPlanComplete(plan)) return;
 
@@ -90,8 +86,18 @@ const saveLearningPlans = async (plans: LearningPlanData[]): Promise<void> => {
   await AsyncStorage.setItem(KEYS.LEARNING_PLANS, JSON.stringify(plans));
 };
 
-// Adds a new plan as a concurrent hobby, or replaces the existing plan for
-// that same hobby if one is already active (leveling up, or regenerating).
+export const getActivePlanId = async (): Promise<string | null> => {
+  return AsyncStorage.getItem(KEYS.ACTIVE_PLAN_ID);
+};
+
+export const setActivePlanId = async (planId: string | null): Promise<void> => {
+  if (planId) {
+    await AsyncStorage.setItem(KEYS.ACTIVE_PLAN_ID, planId);
+  } else {
+    await AsyncStorage.removeItem(KEYS.ACTIVE_PLAN_ID);
+  }
+};
+
 export const upsertLearningPlan = async (
   plan: LearningPlanData
 ): Promise<LearningPlanData[]> => {
@@ -111,6 +117,7 @@ export const upsertLearningPlan = async (
   }
 
   await saveLearningPlans(plans);
+  await setActivePlanId(plan.id);
   return plans;
 };
 
@@ -125,6 +132,11 @@ export const removeLearningPlan = async (
 
   const updated = plans.filter((p) => p.id !== planId);
   await saveLearningPlans(updated);
+
+  if ((await getActivePlanId()) === planId) {
+    await setActivePlanId(null);
+  }
+
   return updated;
 };
 

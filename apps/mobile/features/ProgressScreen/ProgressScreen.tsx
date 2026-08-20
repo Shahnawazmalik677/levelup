@@ -17,11 +17,10 @@ import { styles } from './styles';
 
 export function ProgressScreen() {
   const router = useRouter();
-  const { plans, loading, removePlan, refreshPlans } = useLearningPlans();
+  const { plans, activePlanId, setActivePlan, loading, removePlan, refreshPlans } = useLearningPlans();
   const { streak, refreshStreak } = useStreak();
   const { masteredHobbies, refreshMasteredHobbies } = useMasteredHobbies();
   const { levelHistory, refreshLevelHistory } = useLevelHistory();
-  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [removeDialogVisible, setRemoveDialogVisible] = useState(false);
 
   useFocusEffect(
@@ -47,8 +46,6 @@ export function ProgressScreen() {
     (a, b) => new Date(b.endedAt).getTime() - new Date(a.endedAt).getTime()
   );
 
-  // Both permanent, cross-hobby records - unaffected by whichever hobby is
-  // selected below, so they're rendered above the switcher, not below it.
   const masteredSection = masteredHobbies.length > 0 && (
     <View style={styles.masteredSection}>
       <Text variant="titleMedium" style={styles.sectionTitle}>
@@ -110,7 +107,7 @@ export function ProgressScreen() {
     );
   }
 
-  const plan = plans.find((p) => p.id === selectedPlanId) || plans[0];
+  const plan = plans.find((p) => p.id === activePlanId) || plans[0];
 
   const completed = plan.techniques.filter((t) => t.status === 'completed').length;
   const skipped = plan.techniques.filter((t) => t.status === 'skipped').length;
@@ -153,9 +150,6 @@ export function ProgressScreen() {
         {levelHistorySection}
         {masteredSection}
 
-        {/* Everything below this point is scoped to whichever hobby is selected */}
-
-        {/* Hobby switcher */}
         {plans.length > 1 && (
           <ScrollView
             horizontal
@@ -165,7 +159,7 @@ export function ProgressScreen() {
             {plans.map((p) => (
               <Text
                 key={p.id}
-                onPress={() => setSelectedPlanId(p.id)}
+                onPress={() => setActivePlan(p.id)}
                 style={[
                   styles.hobbyChip,
                   p.id === plan.id && styles.hobbyChipActive,
@@ -240,7 +234,6 @@ export function ProgressScreen() {
           ))}
         </View>
 
-        {/* Remove this hobby */}
         <Button
           mode="outlined"
           onPress={() => setRemoveDialogVisible(true)}
@@ -260,7 +253,6 @@ export function ProgressScreen() {
         destructive
         onConfirm={() => {
           setRemoveDialogVisible(false);
-          setSelectedPlanId(null);
           removePlan(plan.id);
         }}
         onDismiss={() => setRemoveDialogVisible(false)}

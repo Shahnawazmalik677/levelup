@@ -6,10 +6,6 @@ import { isOnboardingComplete } from '../../store/storage';
 import { apiService } from '../../services/api';
 import { styles } from './styles';
 
-// Hobby icons converge toward the center and give way to the app mark — a
-// visual shorthand for "any hobby becomes one focused path." Evenly spaced
-// around a circle rather than randomly scattered, so it reads as composed
-// rather than chaotic.
 const CONVERGING_ICONS = ['♟️', '🎸', '🎨', '🧘', '💻'];
 const RADIUS = 120;
 const iconOffsets = CONVERGING_ICONS.map((_, i) => {
@@ -53,9 +49,6 @@ export function IntroScreen() {
       }),
     ]).start();
 
-    // Fire-and-forget: on a free-tier host the server may be asleep. Pinging
-    // it now, during the animation's own dead time, gives it a head start
-    // waking up instead of waiting for the first real request to trigger it.
     apiService.healthCheck().catch(() => {});
 
     const navigate = async () => {

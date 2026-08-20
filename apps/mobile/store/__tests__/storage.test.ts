@@ -8,6 +8,8 @@ import {
   updateTechnique,
   getLearningPlans,
   getLevelHistory,
+  getActivePlanId,
+  setActivePlanId,
 } from '../storage';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -162,6 +164,45 @@ describe('upsertLearningPlan', () => {
 
     const history = await getLevelHistory();
     expect(history).toHaveLength(0);
+  });
+});
+
+describe('active plan tracking', () => {
+  it('sets the newly added hobby as active', async () => {
+    const chess = makePlan({ id: 'plan-a', hobby: 'Chess' });
+    const guitar = makePlan({ id: 'plan-b', hobby: 'Guitar' });
+    await upsertLearningPlan(chess);
+    await upsertLearningPlan(guitar);
+
+    expect(await getActivePlanId()).toBe('plan-b');
+  });
+
+  it('sets a replacement plan as active even when the hobby name matches', async () => {
+    await upsertLearningPlan(makePlan({ id: 'plan-a', hobby: 'Chess', level: 'beginner' }));
+    await setActivePlanId('plan-a');
+    await upsertLearningPlan(makePlan({ id: 'plan-b', hobby: 'Chess', level: 'intermediate' }));
+
+    expect(await getActivePlanId()).toBe('plan-b');
+  });
+
+  it('clears the active plan id when the active plan is removed', async () => {
+    const chess = makePlan({ id: 'plan-a', hobby: 'Chess' });
+    await upsertLearningPlan(chess);
+
+    await removeLearningPlan('plan-a');
+
+    expect(await getActivePlanId()).toBeNull();
+  });
+
+  it('leaves the active plan id untouched when a different plan is removed', async () => {
+    const chess = makePlan({ id: 'plan-a', hobby: 'Chess' });
+    const guitar = makePlan({ id: 'plan-b', hobby: 'Guitar' });
+    await upsertLearningPlan(chess);
+    await upsertLearningPlan(guitar);
+
+    await removeLearningPlan('plan-a');
+
+    expect(await getActivePlanId()).toBe('plan-b');
   });
 });
 

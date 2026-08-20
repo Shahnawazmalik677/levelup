@@ -90,9 +90,6 @@ export function TechniqueDetailScreen() {
     setCompleteDialogVisible(false);
     setCelebrating(true);
 
-    // Hold the celebration for a beat so it reads as an intentional moment,
-    // and so every write below is fully settled before My Path refetches on
-    // return — otherwise the back-navigation can land on stale/half-written data.
     const minDelay = new Promise<void>((resolve) => setTimeout(resolve, 1300));
     const persist = (async () => {
       const updatedPlan = await markTechniqueComplete(plan.id, technique.id);

@@ -31,9 +31,6 @@ export function ExploreScreen() {
     useCallback(() => {
       refreshPlans(true);
 
-      // Explore is a "start something new" wizard, not a draft to resume -
-      // reset it on blur so returning to the tab later never shows a stale
-      // selection from an earlier visit.
       return () => {
         setStep('hobby');
         setSelectedHobby(null);

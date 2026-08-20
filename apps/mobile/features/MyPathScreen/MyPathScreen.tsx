@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { View, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -12,9 +12,8 @@ import { styles } from './styles';
 
 export function MyPathScreen() {
   const router = useRouter();
-  const { plans, loading, refreshPlans } = useLearningPlans();
+  const { plans, activePlanId, setActivePlan, loading, refreshPlans } = useLearningPlans();
   const { streak, refreshStreak } = useStreak();
-  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -49,7 +48,7 @@ export function MyPathScreen() {
     );
   }
 
-  const plan = plans.find((p) => p.id === selectedPlanId) || plans[0];
+  const plan = plans.find((p) => p.id === activePlanId) || plans[0];
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -78,7 +77,6 @@ export function MyPathScreen() {
           />
         </View>
 
-        {/* Hobby switcher */}
         {plans.length > 1 && (
           <ScrollView
             horizontal
@@ -88,7 +86,7 @@ export function MyPathScreen() {
             {plans.map((p) => (
               <Text
                 key={p.id}
-                onPress={() => setSelectedPlanId(p.id)}
+                onPress={() => setActivePlan(p.id)}
                 style={[
                   styles.hobbyChip,
                   p.id === plan.id && styles.hobbyChipActive,

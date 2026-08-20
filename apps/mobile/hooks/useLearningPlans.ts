@@ -3,6 +3,8 @@ import { Technique } from '../types';
 import {
   LearningPlanData,
   getLearningPlans,
+  getActivePlanId,
+  setActivePlanId,
   upsertLearningPlan,
   updateTechnique,
   replaceTechnique,
@@ -11,13 +13,15 @@ import {
 
 export const useLearningPlans = () => {
   const [plans, setPlans] = useState<LearningPlanData[]>([]);
+  const [activePlanId, setActivePlanIdState] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadPlans = useCallback(async (silent: boolean = false) => {
     try {
       if (!silent) setLoading(true);
-      const data = await getLearningPlans();
+      const [data, activeId] = await Promise.all([getLearningPlans(), getActivePlanId()]);
       setPlans(data);
+      setActivePlanIdState(activeId);
     } catch (error) {
       console.error('Failed to load learning plans:', error);
     } finally {
@@ -29,9 +33,15 @@ export const useLearningPlans = () => {
     loadPlans();
   }, [loadPlans]);
 
+  const setActivePlan = useCallback(async (planId: string) => {
+    await setActivePlanId(planId);
+    setActivePlanIdState(planId);
+  }, []);
+
   const addPlan = useCallback(async (newPlan: LearningPlanData) => {
     const updated = await upsertLearningPlan(newPlan);
     setPlans(updated);
+    setActivePlanIdState(newPlan.id);
     return updated;
   }, []);
 
@@ -107,11 +117,14 @@ export const useLearningPlans = () => {
   const removePlan = useCallback(async (planId: string) => {
     const updated = await removeLearningPlan(planId);
     setPlans(updated);
+    setActivePlanIdState((prev) => (prev === planId ? null : prev));
     return updated;
   }, []);
 
   return {
     plans,
+    activePlanId,
+    setActivePlan,
     loading,
     addPlan,
     markTechniqueComplete,
