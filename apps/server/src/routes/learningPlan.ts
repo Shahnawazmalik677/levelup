@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { generateLearningPlan } from '../services/gemini';
-import { GeneratePlanRequest } from '../types';
+import { GeneratePlanRequest, SKILL_LEVELS } from '../types';
 
 export const learningPlanRouter = Router();
 
@@ -19,11 +19,10 @@ learningPlanRouter.post(
         return;
       }
 
-      const validLevels = ['curious', 'beginner', 'intermediate'];
-      if (!validLevels.includes(level)) {
+      if (!SKILL_LEVELS.includes(level)) {
         res.status(400).json({
           success: false,
-          error: `level must be one of: ${validLevels.join(', ')}`,
+          error: `level must be one of: ${SKILL_LEVELS.join(', ')}`,
         });
         return;
       }

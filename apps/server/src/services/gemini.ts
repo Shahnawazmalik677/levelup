@@ -79,7 +79,16 @@ Return a single JSON object with:
 Return ONLY the JSON object, no markdown or extra text.`;
 }
 
-function formatTechnique(raw: any, order: number, isFirst: boolean): Technique {
+interface RawTechnique {
+  name: string;
+  description: string;
+  whyItMatters: string;
+  estimatedTime: string;
+  difficulty: Technique['difficulty'];
+  practiceChecklist?: { text: string }[];
+}
+
+function formatTechnique(raw: RawTechnique, order: number, isFirst: boolean): Technique {
   return {
     id: uuidv4(),
     name: raw.name,
@@ -90,7 +99,7 @@ function formatTechnique(raw: any, order: number, isFirst: boolean): Technique {
     progress: 0,
     estimatedTime: raw.estimatedTime,
     difficulty: raw.difficulty,
-    practiceChecklist: (raw.practiceChecklist || []).map((item: any) => ({
+    practiceChecklist: (raw.practiceChecklist || []).map((item) => ({
       id: uuidv4(),
       text: item.text,
       completed: false,
@@ -107,11 +116,9 @@ export async function generateLearningPlan(
   const prompt = buildPlanPrompt(hobby, level, preferences);
   const result = await model.generateContent(prompt);
   const text = result.response.text();
-  const rawTechniques = JSON.parse(text);
+  const rawTechniques: RawTechnique[] = JSON.parse(text);
 
-  return rawTechniques.map((raw: any, index: number) =>
-    formatTechnique(raw, index + 1, index === 0)
-  );
+  return rawTechniques.map((raw, index) => formatTechnique(raw, index + 1, index === 0));
 }
 
 export async function generateSwapTechnique(
@@ -124,7 +131,7 @@ export async function generateSwapTechnique(
   const prompt = buildSwapPrompt(hobby, level, currentTechnique, existingTechniques, reason);
   const result = await model.generateContent(prompt);
   const text = result.response.text();
-  const raw = JSON.parse(text);
+  const raw: RawTechnique = JSON.parse(text);
 
   return formatTechnique(raw, 0, false);
 }
