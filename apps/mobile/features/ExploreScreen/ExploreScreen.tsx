@@ -20,18 +20,29 @@ export function ExploreScreen() {
   const router = useRouter();
   const { plans, refreshPlans } = useLearningPlans();
 
-  useFocusEffect(
-    useCallback(() => {
-      refreshPlans(true);
-    }, [refreshPlans])
-  );
-
   const [step, setStep] = useState<Step>('hobby');
   const [selectedHobby, setSelectedHobby] = useState<typeof PRESET_HOBBIES[0] | null>(null);
   const [customHobby, setCustomHobby] = useState('');
   const [selectedLevel, setSelectedLevel] = useState<SkillLevel | null>(null);
   const [error, setError] = useState('');
   const [confirmReplaceVisible, setConfirmReplaceVisible] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshPlans(true);
+
+      // Explore is a "start something new" wizard, not a draft to resume -
+      // reset it on blur so returning to the tab later never shows a stale
+      // selection from an earlier visit.
+      return () => {
+        setStep('hobby');
+        setSelectedHobby(null);
+        setCustomHobby('');
+        setSelectedLevel(null);
+        setError('');
+      };
+    }, [refreshPlans])
+  );
 
   const hobbyName = selectedHobby?.name || customHobby.trim();
   const existingPlan = plans.find(
@@ -125,15 +136,10 @@ export function ExploreScreen() {
 
       await setOnboardingComplete();
       await refreshPlans();
-
-      setSelectedHobby(null);
-      setCustomHobby('');
-      setSelectedLevel(null);
-      setStep('hobby');
       router.replace('/(tabs)');
     } catch (err) {
       console.error('Failed to generate plan:', err);
-      setError('Failed to generate your plan. Please try again.');
+      setError(err instanceof Error ? err.message : 'Failed to generate your plan. Please try again.');
       animateTransition('level');
     }
   };
